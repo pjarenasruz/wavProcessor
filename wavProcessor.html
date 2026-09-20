@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wavProcessor - Batch Audio Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- JSZip para compresión masiva -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-600/30">
+                    <i data-lucide="waves" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg leading-tight">wavProcessor</h1>
+                    <p class="text-xs text-slate-400">Procesador Batch para Samplers & Hardware</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Panel de Configuración (5 columnas) -->
+        <section class="lg:col-span-5 flex flex-col gap-4">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-4">
+                
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i> Cadena de Proceso
+                    </h2>
+                    <span class="text-[10px] text-slate-500">Selecciona las etapas</span>
+                </div>
+
+                <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1 custom-scrollbar">
+
+                    <!-- 1. Formato de Audio -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-1" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>1. Formato & Resample</span>
+                        </label>
+                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Bits</span>
+                                <select id="p1-bits" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    <option value="16" selected>16-bit PCM</option>
+                                    <option value="24">24-bit PCM</option>
+                                    <option value="8">8-bit PCM</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Sample Rate</span>
+                                <select id="p1-rate" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    <option value="44100" selected>44.1 kHz</option>
+                                    <option value="48000">48.0 kHz</option>
+                                    <option value="22050">22.05 kHz</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Convertidor a Mono -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-2" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>2. Convertidor a Mono</span>
+                        </label>
+                        <div class="pl-6 pt-2 text-xs">
+                            <select id="p2-mode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="mix" selected>Promediar canales (L+R / 2)</option>
+                                <option value="left">Solo canal izquierdo (L)</option>
+                                <option value="right">Solo canal derecho (R)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Normalizar Volumen -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-3" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>3. Normalizar Volumen</span>
+                        </label>
+                        <div class="pl-6 pt-2 flex items-center gap-2 text-xs">
+                            <span class="text-slate-400">Pico máximo:</span>
+                            <input type="number" id="p3-target" step="0.1" value="-0.1" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <span class="text-slate-400">dBFS</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Recorte & Fade Out -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-4" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>4. Recortar Loop & Fade Out</span>
+                        </label>
+                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Duración (seg)</span>
+                                <input type="number" id="p4-duration" step="0.01" value="1.65" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Fade Out (ms)</span>
+                                <input type="number" id="p4-fade" value="15" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Ajustar BPM -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-5" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>5. Ajustar Loop a BPM</span>
+                        </label>
+                        <div class="pl-6 pt-2 space-y-2 text-xs">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">BPM Original</span>
+                                    <input type="number" id="p5-bpmOrig" value="150" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">BPM Objetivo</span>
+                                    <input type="number" id="p5-bpmTarget" value="120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-500">Reescala la velocidad de reproducción del audio desde el tempo de origen al objetivo.</p>
+                        </div>
+                    </div>
+
+                    <!-- 6. Renombrado Masivo -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-6" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>6. Renombrar Lote de Archivos</span>
+                        </label>
+                        <div class="pl-6 pt-2 text-xs">
+                            <span class="text-[10px] text-slate-400 block mb-1">Prefijo de nombre</span>
+                            <input type="text" id="p6-prefix" placeholder="ej. PERC_" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <span class="text-[10px] text-slate-500 mt-1 block">Generará: PERC_01.wav, PERC_02.wav...</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. Metadatos -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-7" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>7. Limpieza & Edición de Metadatos</span>
+                        </label>
+                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Artista/Autor</span>
+                                <input type="text" id="p7-artist" placeholder="Mi Nombre" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">Álbum/Pack</span>
+                                <input type="text" id="p7-album" placeholder="SamplePack 2026" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Sanitización Anti-Algoritmo -->
+                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                            <input type="checkbox" id="proc-8" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                            <span>8. Sanitización & Inversión de Fase</span>
+                        </label>
+                        <div class="pl-6 pt-1 text-[11px] text-slate-400 leading-snug">
+                            Invierte la fase 180°, aplica ganancia de -0.02 dB y añade 5 muestras de silencio al final para forzar un hash binario PCM nuevo.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Zona de Archivos y Vista Previa (7 columnas) -->
+        <section class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Drag & Drop Zone -->
+            <div id="dropzone" class="border-2 border-dashed border-slate-800 hover:border-indigo-500/80 bg-slate-900/50 hover:bg-slate-900 rounded-2xl p-8 text-center transition cursor-pointer flex flex-col items-center justify-center gap-3 group">
+                <input type="file" id="fileInput" multiple accept=".wav,audio/*" class="hidden">
+                <div class="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl border border-indigo-500/20 group-hover:scale-110 transition">
+                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm text-slate-200">Arrastra aquí tus archivos WAV o haz clic</p>
+                    <p class="text-xs text-slate-500 mt-1">Soporta múltiples archivos a la vez. Procesamiento 100% privado en navegador.</p>
+                </div>
+            </div>
+
+            <!-- Barra de estado y Acciones -->
+            <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-3 rounded-2xl gap-2 flex-wrap sm:flex-nowrap">
+                <span class="text-xs text-slate-400 pl-2">
+                    En cola: <b id="file-count" class="text-slate-200">0</b> archivos
+                </span>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearFiles()" class="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition">
+                        Limpiar todo
+                    </button>
+
+                    <!-- Botón 1: Procesar -->
+                    <button id="btn-process" onclick="processAllFiles()" disabled class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-indigo-600/25 flex items-center gap-1.5">
+                        <i data-lucide="cpu" class="w-4 h-4"></i>
+                        Procesar
+                    </button>
+
+                    <!-- Botón 2: Descargar ZIP -->
+                    <button id="btn-download" onclick="downloadZip()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Descargar ZIP
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Archivos Cargados -->
+            <div id="file-list" class="flex-1 space-y-3 overflow-y-auto max-h-[500px] pr-1 custom-scrollbar">
+                <div id="empty-state" class="text-center py-16 border border-slate-900 rounded-2xl bg-slate-900/20">
+                    <i data-lucide="disc" class="w-12 h-12 text-slate-800 mx-auto mb-2 animate-spin-slow"></i>
+                    <p class="text-xs text-slate-600">Sube archivos WAV para comenzar</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        let loadedFiles = [];
+        let zipResultBlob = null;
+        let activeAudioSource = null;
+        let playingId = null;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('file-list');
+        const emptyState = document.getElementById('empty-state');
+        const fileCount = document.getElementById('file-count');
+        const btnProcess = document.getElementById('btn-process');
+        const btnDownload = document.getElementById('btn-download');
+
+        // Escucha cambios en las casillas de verificación para actualizar estado del botón
+        document.querySelectorAll('.proc-step').forEach(cb => {
+            cb.addEventListener('change', updateUIState);
+        });
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-indigo-500'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-indigo-500'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-indigo-500');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        async function handleFiles(files) {
+            for (let file of files) {
+                if (file.name.toLowerCase().endsWith('.wav') || file.type.includes('audio')) {
+                    const id = Math.random().toString(36).substr(2, 9);
+                    const item = { 
+                        id, 
+                        file, 
+                        status: 'ready', 
+                        originalBuffer: null, 
+                        processedBuffer: null 
+                    };
+                    loadedFiles.push(item);
+                    loadAudioBuffer(item);
+                }
+            }
+            zipResultBlob = null;
+            updateFileList();
+        }
+
+        async function loadAudioBuffer(item) {
+            try {
+                const arrayBuffer = await item.file.arrayBuffer();
+                item.originalBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                updateFileList();
+            } catch (e) {
+                console.log("Error decodificando el audio:", e);
+            }
+        }
+
+        function clearFiles() {
+            stopAudio();
+            loadedFiles = [];
+            zipResultBlob = null;
+            updateFileList();
+        }
+
+        function togglePlay(id) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (playingId === id) {
+                stopAudio();
+                updateFileList();
+                return;
+            }
+
+            stopAudio();
+            const item = loadedFiles.find(f => f.id === id);
+            if (!item) return;
+
+            const bufferToPlay = item.processedBuffer || item.originalBuffer;
+
+            if (bufferToPlay) {
+                activeAudioSource = audioCtx.createBufferSource();
+                activeAudioSource.buffer = bufferToPlay;
+                activeAudioSource.connect(audioCtx.destination);
+                
+                activeAudioSource.onended = () => {
+                    playingId = null;
+                    updateFileList();
+                };
+
+                activeAudioSource.start(0);
+                playingId = id;
+                updateFileList();
+            }
+        }
+
+        function stopAudio() {
+            if (activeAudioSource) {
+                try { activeAudioSource.stop(); } catch(e){}
+                activeAudioSource = null;
+            }
+            playingId = null;
+        }
+
+        function isAnyStepChecked() {
+            var steps = document.querySelectorAll('.proc-step');
+            for (var i = 0; i < steps.length; i++) {
+                if (steps[i].checked) return true;
+            }
+            return false;
+        }
+
+        function updateUIState() {
+            var hasFiles = loadedFiles.length > 0;
+            var hasSteps = isAnyStepChecked();
+            
+            btnProcess.disabled = !hasFiles || !hasSteps;
+            btnDownload.disabled = !zipResultBlob;
+        }
+
+        function updateFileList() {
+            fileCount.textContent = loadedFiles.length;
+            updateUIState();
+
+            if (loadedFiles.length === 0) {
+                emptyState.classList.remove('hidden');
+                fileList.innerHTML = '';
+                fileList.appendChild(emptyState);
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            fileList.innerHTML = '';
+
+            loadedFiles.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/80 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-3 text-xs";
+
+                let statusBadge = `<span class="text-slate-500">Sin procesar</span>`;
+                if(item.status === 'processing') statusBadge = `<span class="text-amber-400 animate-pulse font-semibold">Procesando...</span>`;
+                if(item.status === 'done') statusBadge = `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Procesado</span>`;
+
+                const isPlaying = playingId === item.id;
+                const isProcessed = item.processedBuffer !== null;
+
+                let playBtnColor = 'bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 border-indigo-500/30';
+                if (isProcessed) {
+                    playBtnColor = 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border-emerald-500/30';
+                }
+                if (isPlaying) {
+                    playBtnColor = 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border-rose-500/30';
+                }
+
+                const playBtnIcon = isPlaying ? 'square' : 'play';
+                const audioLabel = isProcessed ? 'Escuchar procesado' : 'Escuchar original';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <button onclick="togglePlay('${item.id}')" title="${audioLabel}" class="p-2.5 rounded-xl border ${playBtnColor} transition flex-shrink-0 flex items-center justify-center">
+                            <i data-lucide="${playBtnIcon}" class="w-4 h-4 fill-current"></i>
+                        </button>
+                        <div class="truncate">
+                            <p class="font-medium text-slate-200 truncate">${item.file.name}</p>
+                            <span class="text-[10px] text-slate-500">${(item.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        ${statusBadge}
+                        <button onclick="removeFile('${item.id}')" class="text-slate-600 hover:text-rose-400 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                fileList.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function removeFile(id) {
+            if (playingId === id) stopAudio();
+            loadedFiles = loadedFiles.filter(f => f.id !== id);
+            zipResultBlob = null;
+            updateFileList();
+        }
+
+        function processAllFiles() {
+            stopAudio();
+
+            if (!isAnyStepChecked()) {
+                alert("Debes marcar al menos una acción en la cadena de proceso antes de continuar.");
+                return;
+            }
+
+            var procMetadata = document.getElementById('proc-7').checked;
+            var metaArtist = document.getElementById('p7-artist').value.trim();
+            var metaAlbum = document.getElementById('p7-album').value.trim();
+
+            if (procMetadata && !metaArtist && !metaAlbum) {
+                alert("Has activado la 'Edición de Metadatos', pero no has introducido el Artista ni el Álbum. Por favor, rellena al menos uno de los campos o desmarca la casilla.");
+                return;
+            }
+
+            var zip = new JSZip();
+            btnProcess.disabled = true;
+            btnDownload.disabled = true;
+
+            var prefixName = document.getElementById('p6-prefix').value.trim();
+            var targetBits = document.getElementById('proc-1').checked ? parseInt(document.getElementById('p1-bits').value) : 16;
+            var finalArtist = procMetadata ? metaArtist : '';
+            var finalAlbum = procMetadata ? metaAlbum : '';
+
+            var sequence = Promise.resolve();
+
+            loadedFiles.forEach(function(item, i) {
+                sequence = sequence.then(function() {
+                    item.status = 'processing';
+                    updateFileList();
+
+                    var bufferPromise = item.originalBuffer 
+                        ? Promise.resolve(item.originalBuffer) 
+                        : item.file.arrayBuffer().then(function(ab) {
+                            return audioCtx.decodeAudioData(ab);
+                        }).then(function(decoded) {
+                            item.originalBuffer = decoded;
+                            return decoded;
+                        });
+
+                    return bufferPromise.then(function(audioBuffer) {
+                        return processPipeline(audioBuffer, item);
+                    }).then(function(processedBuffer) {
+                        item.processedBuffer = processedBuffer;
+
+                        var wavBlob = audioBufferToWavBlob(processedBuffer, targetBits, { artist: finalArtist, album: finalAlbum });
+                        var finalName = item.file.name;
+
+                        if (document.getElementById('proc-6').checked && prefixName) {
+                            var padLen = loadedFiles.length >= 100 ? 3 : 2;
+                            var indexStr = String(i + 1).padStart(padLen, '0');
+                            finalName = prefixName + indexStr + '.wav';
+                        }
+
+                        zip.file(finalName, wavBlob);
+                        item.status = 'done';
+                        updateFileList();
+                    }).catch(function(e) {
+                        console.error("Error procesando:", e);
+                        item.status = 'error';
+                        updateFileList();
+                    });
+                });
+            });
+
+            sequence.then(function() {
+                return zip.generateAsync({type: "blob"});
+            }).then(function(blob) {
+                zipResultBlob = blob;
+                btnProcess.disabled = false;
+                btnDownload.disabled = false;
+            });
+        }
+
+        function downloadZip() {
+            if (!zipResultBlob) return;
+            const downloadUrl = URL.createObjectURL(zipResultBlob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = "samples_procesados.zip";
+            a.click();
+        }
+
+        async function processPipeline(buffer, item) {
+            let sampleRate = buffer.sampleRate;
+            let targetRate = document.getElementById('proc-1').checked ? parseInt(document.getElementById('p1-rate').value) : sampleRate;
+            let channels = buffer.numberOfChannels;
+
+            const isMono = document.getElementById('proc-2').checked;
+            const targetChannels = isMono ? 1 : channels;
+            let length = buffer.length;
+
+            let channelData = [];
+            if (isMono) {
+                const mono = new Float32Array(length);
+                const mode = document.getElementById('p2-mode').value;
+                const l = buffer.getChannelData(0);
+                const r = channels > 1 ? buffer.getChannelData(1) : l;
+
+                for (let i = 0; i < length; i++) {
+                    if (mode === 'left') {
+                        mono[i] = l[i];
+                    } else if (mode === 'right') {
+                        mono[i] = r[i];
+                    } else {
+                        mono[i] = (l[i] + r[i]) / 2;
+                    }
+                }
+                channelData = [mono];
+            } else {
+                for (let c = 0; c < channels; c++) channelData.push(new Float32Array(buffer.getChannelData(c)));
+            }
+
+            if (document.getElementById('proc-8').checked) {
+                const microGain = Math.pow(10, -0.02 / 20);
+                for (let c = 0; c < channelData.length; c++) {
+                    for (let i = 0; i < length; i++) {
+                        channelData[c][i] = -channelData[c][i] * microGain;
+                    }
+                }
+            }
+
+            let targetLength = length;
+            if (document.getElementById('proc-4').checked) {
+                const maxSec = parseFloat(document.getElementById('p4-duration').value);
+                if (!isNaN(maxSec) && maxSec > 0) {
+                    targetLength = Math.min(length, Math.floor(maxSec * sampleRate));
+                }
+                const fadeMs = parseFloat(document.getElementById('p4-fade').value) || 0;
+                const fadeFrames = Math.floor((fadeMs / 1000) * sampleRate);
+                const fadeStart = targetLength - fadeFrames;
+
+                if (fadeStart > 0) {
+                    for (let c = 0; c < channelData.length; c++) {
+                        for (let i = 0; i < fadeFrames; i++) {
+                            const gain = 1.0 - (i / fadeFrames);
+                            channelData[c][fadeStart + i] *= gain;
+                        }
+                    }
+                }
+            }
+
+            if (document.getElementById('proc-3').checked) {
+                let maxPeak = 0;
+                for (let c = 0; c < channelData.length; c++) {
+                    for (let i = 0; i < targetLength; i++) {
+                        maxPeak = Math.max(maxPeak, Math.abs(channelData[c][i]));
+                    }
+                }
+                if (maxPeak > 0) {
+                    const targetDb = parseFloat(document.getElementById('p3-target').value) || -0.1;
+                    const gainFactor = Math.pow(10, targetDb / 20) / maxPeak;
+                    for (let c = 0; c < channelData.length; c++) {
+                        for (let i = 0; i < targetLength; i++) {
+                            channelData[c][i] *= gainFactor;
+                        }
+                    }
+                }
+            }
+
+            const padding = document.getElementById('proc-8').checked ? 5 : 0;
+            const finalLength = targetLength + padding;
+
+            const tempCtx = new AudioContext();
+            let processedBuffer = tempCtx.createBuffer(targetChannels, finalLength, sampleRate);
+
+            for (let c = 0; c < targetChannels; c++) {
+                const arr = processedBuffer.getChannelData(c);
+                for (let i = 0; i < targetLength; i++) arr[i] = channelData[c][i];
+            }
+
+            if (document.getElementById('proc-5').checked) {
+                const origBpm = parseFloat(document.getElementById('p5-bpmOrig').value) || 120;
+                const targetBpm = parseFloat(document.getElementById('p5-bpmTarget').value) || 120;
+                
+                const speedRatio = targetBpm / origBpm;
+                const stretchedLength = Math.floor(processedBuffer.length / speedRatio);
+                
+                const offCtx = new OfflineAudioContext(targetChannels, stretchedLength, sampleRate);
+                const source = offCtx.createBufferSource();
+                source.buffer = processedBuffer;
+                source.playbackRate.value = speedRatio;
+                source.connect(offCtx.destination);
+                source.start(0);
+                processedBuffer = await offCtx.startRendering();
+            }
+
+            if (sampleRate !== targetRate) {
+                const resampleFrames = Math.floor(processedBuffer.length * (targetRate / sampleRate));
+                const resampleCtx = new OfflineAudioContext(targetChannels, resampleFrames, targetRate);
+                const source = resampleCtx.createBufferSource();
+                source.buffer = processedBuffer;
+                source.connect(resampleCtx.destination);
+                source.start(0);
+                return await resampleCtx.startRendering();
+            }
+
+            return processedBuffer;
+        }
+
+        function audioBufferToWavBlob(buffer, bitDepth, metadata = {}) {
+            const numChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const bytesPerSample = bitDepth / 8;
+            const blockAlign = numChannels * bytesPerSample;
+            const dataByteLength = buffer.length * blockAlign;
+
+            function createInfoChunk(fourCC, text) {
+                if (!text) return null;
+                let textBytes = new TextEncoder().encode(text + '\0');
+                if (textBytes.length % 2 !== 0) {
+                    const padded = new Uint8Array(textBytes.length + 1);
+                    padded.set(textBytes);
+                    textBytes = padded;
+                }
+                const chunk = new Uint8Array(8 + textBytes.length);
+                chunk.set(new TextEncoder().encode(fourCC), 0);
+                const view = new DataView(chunk.buffer);
+                view.setUint32(4, textBytes.length, true);
+                chunk.set(textBytes, 8);
+                return chunk;
+            }
+
+            const artistChunk = createInfoChunk('IART', metadata.artist);
+            const albumChunk = createInfoChunk('IPRD', metadata.album);
+
+            let totalListSize = 0;
+            if (artistChunk) totalListSize += artistChunk.length;
+            if (albumChunk) totalListSize += albumChunk.length;
+
+            let listHeaderSize = 0;
+            if (totalListSize > 0) {
+                listHeaderSize = 12 + totalListSize;
+            }
+
+            const headerSize = 44;
+            const totalSize = headerSize + dataByteLength + listHeaderSize;
+            const arrayBuffer = new ArrayBuffer(totalSize);
+            const view = new DataView(arrayBuffer);
+
+            function writeString(offset, string) {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            }
+
+            writeString(0, 'RIFF');
+            view.setUint32(4, totalSize - 8, true);
+            writeString(8, 'WAVE');
+
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * blockAlign, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitDepth, true);
+
+            writeString(36, 'data');
+            view.setUint32(40, dataByteLength, true);
+
+            let offset = 44;
+            for (let i = 0; i < buffer.length; i++) {
+                for (let ch = 0; ch < numChannels; ch++) {
+                    let sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+                    if (bitDepth === 16) {
+                        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                        offset += 2;
+                    } else if (bitDepth === 24) {
+                        let val = Math.floor(sample < 0 ? sample * 0x800000 : sample * 0x7FFFFF);
+                        view.setUint8(offset, val & 0xFF);
+                        view.setUint8(offset + 1, (val >> 8) & 0xFF);
+                        view.setUint8(offset + 2, (val >> 16) & 0xFF);
+                        offset += 3;
+                    } else if (bitDepth === 8) {
+                        view.setUint8(offset, Math.floor((sample + 1) * 127.5));
+                        offset += 1;
+                    }
+                }
+            }
+
+            if (listHeaderSize > 0) {
+                writeString(offset, 'LIST');
+                view.setUint32(offset + 4, totalListSize + 4, true);
+                writeString(offset + 8, 'INFO');
+                offset += 12;
+
+                if (artistChunk) {
+                    new Uint8Array(arrayBuffer, offset).set(artistChunk);
+                    offset += artistChunk.length;
+                }
+                if (albumChunk) {
+                    new Uint8Array(arrayBuffer, offset).set(albumChunk);
+                    offset += albumChunk.length;
+                }
+            }
+
+            return new Blob([arrayBuffer], { type: 'audio/wav' });
+        }
+    </script>
+</body>
+</html>
