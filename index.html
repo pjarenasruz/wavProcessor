@@ -34,208 +34,295 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
 
-        <!-- Panel de Configuración (5 columnas) -->
-        <section class="lg:col-span-5 flex flex-col gap-4">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-4">
+        <!-- Manual/Tutorial Desplegable Superior -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <details class="group">
+                <summary class="flex items-center justify-between p-4 cursor-pointer select-none bg-slate-900 hover:bg-slate-800/60 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-semibold text-sm md:text-base text-slate-200">Guía de Uso & Funcionamiento</h2>
+                            <p class="text-xs text-slate-400">Haz clic para desplegar el manual de procesos y herramientas</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                </summary>
                 
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i> Cadena de Proceso
-                    </h2>
-                    <span class="text-[10px] text-slate-500">Selecciona las etapas</span>
-                </div>
+                <div class="p-4 md:p-6 border-t border-slate-800/80 bg-slate-950/40 text-xs text-slate-300 leading-relaxed grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">1</span> Formato & Resample
+                            </h3>
+                            <p class="text-slate-400">Permite adaptar la frecuencia de muestreo (kHz) y la profundidad de bits para garantizar la compatibilidad con cualquier sampler, sintetizador hardware o entorno DAWLESS. Por defecto, se recomienda utilizar <b>16 bits y 44.1 kHz</b>.</p>
+                        </div>
 
-                <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1 custom-scrollbar">
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">2</span> Convertidor a Mono
+                            </h3>
+                            <p class="text-slate-400">Permite promediar los canales izquierdo y derecho (L+R/2) o extraer un canal único en específico (L o R). Es ideal para muestras de percusión y caja/bombo, optimizando y reduciendo a la mitad el consumo de memoria en los dispositivos hardware.</p>
+                        </div>
 
-                    <!-- 1. Formato de Audio -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-1" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>1. Formato & Resample</span>
-                        </label>
-                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Bits</span>
-                                <select id="p1-bits" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                    <option value="16" selected>16-bit PCM</option>
-                                    <option value="24">24-bit PCM</option>
-                                    <option value="8">8-bit PCM</option>
-                                </select>
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Sample Rate</span>
-                                <select id="p1-rate" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                    <option value="44100" selected>44.1 kHz</option>
-                                    <option value="48000">48.0 kHz</option>
-                                    <option value="22050">22.05 kHz</option>
-                                </select>
-                            </div>
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">3</span> Normalizar Volumen
+                            </h3>
+                            <p class="text-slate-400">Ajusta automáticamente la ganancia para homogeneizar el nivel máximo de pico de todo el lote de archivos. Viene configurado por defecto a <b>-0.1 dBFS</b> para maximizar la dinámica sin generar distorsión ni clip digital.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">4</span> Recortar Loop & Fade Out
+                            </h3>
+                            <p class="text-slate-400">Especialmente útil para acortar la duración de loops de varios compases a un tiempo fijo y evitar colas largas innecesarias. Incluye una rampa de atenuación suave (Fade Out) al final para eliminar chasquidos o <i>pops</i> en el punto de corte.</p>
                         </div>
                     </div>
 
-                    <!-- 2. Convertidor a Mono -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-2" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>2. Convertidor a Mono</span>
-                        </label>
-                        <div class="pl-6 pt-2 text-xs">
-                            <select id="p2-mode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                <option value="mix" selected>Promediar canales (L+R / 2)</option>
-                                <option value="left">Solo canal izquierdo (L)</option>
-                                <option value="right">Solo canal derecho (R)</option>
-                            </select>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">5</span> Ajustar Loop a BPM
+                            </h3>
+                            <p class="text-slate-400">Reescala la velocidad de reproducción para sincronizar loops de un tempo a otro sin alterar la tonalidad de las notas. Como ejemplo de uso, viene preconfigurado para acelerar/desacelerar un sample grabado a 150 BPM para adaptarlo a 120 BPM.</p>
                         </div>
-                    </div>
 
-                    <!-- 3. Normalizar Volumen -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-3" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>3. Normalizar Volumen</span>
-                        </label>
-                        <div class="pl-6 pt-2 flex items-center gap-2 text-xs">
-                            <span class="text-slate-400">Pico máximo:</span>
-                            <input type="number" id="p3-target" step="0.1" value="-0.1" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <span class="text-slate-400">dBFS</span>
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">6</span> Renombrar Lote de Archivos
+                            </h3>
+                            <p class="text-slate-400">Organiza y estandariza los nombres de tus samples agregando un prefijo uniforme y una secuencia numérica correlativa. Por ejemplo, al ingresar el prefijo <code>PERC_</code>, obtendrás: <i>PERC_01.wav, PERC_02.wav... PERC_10.wav</i>.</p>
                         </div>
-                    </div>
 
-                    <!-- 4. Recorte & Fade Out -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-4" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>4. Recortar Loop & Fade Out</span>
-                        </label>
-                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Duración (seg)</span>
-                                <input type="number" id="p4-duration" step="0.01" value="1.65" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Fade Out (ms)</span>
-                                <input type="number" id="p4-fade" value="15" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            </div>
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">7</span> Limpieza & Edición de Metadatos
+                            </h3>
+                            <p class="text-slate-400">Elimina etiquetas ocultas o irrelevantes del archivo WAV original y escribe un nuevo encabezado estándar RIFF INFO con el nombre de Artista/Autor y Álbum/Pack de muestras para organizar tu librería.</p>
                         </div>
-                    </div>
 
-                    <!-- 5. Ajustar BPM -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-5" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>5. Ajustar Loop a BPM</span>
-                        </label>
-                        <div class="pl-6 pt-2 space-y-2 text-xs">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <span class="text-[10px] text-slate-400 block mb-1">BPM Original</span>
-                                    <input type="number" id="p5-bpmOrig" value="150" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <span class="text-[10px] text-slate-400 block mb-1">BPM Objetivo</span>
-                                    <input type="number" id="p5-bpmTarget" value="120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                </div>
-                            </div>
-                            <p class="text-[10px] text-slate-500">Reescala la velocidad de reproducción del audio desde el tempo de origen al objetivo.</p>
-                        </div>
-                    </div>
-
-                    <!-- 6. Renombrado Masivo -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-6" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>6. Renombrar Lote de Archivos</span>
-                        </label>
-                        <div class="pl-6 pt-2 text-xs">
-                            <span class="text-[10px] text-slate-400 block mb-1">Prefijo de nombre</span>
-                            <input type="text" id="p6-prefix" placeholder="ej. PERC_" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <span class="text-[10px] text-slate-500 mt-1 block">Generará: PERC_01.wav, PERC_02.wav...</span>
-                        </div>
-                    </div>
-
-                    <!-- 7. Metadatos -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-7" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>7. Limpieza & Edición de Metadatos</span>
-                        </label>
-                        <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Artista/Autor</span>
-                                <input type="text" id="p7-artist" placeholder="Mi Nombre" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-400 block mb-1">Álbum/Pack</span>
-                                <input type="text" id="p7-album" placeholder="SamplePack 2026" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 8. Sanitización Anti-Algoritmo -->
-                    <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
-                            <input type="checkbox" id="proc-8" class="proc-step w-4 h-4 accent-indigo-500 rounded">
-                            <span>8. Sanitización & Inversión de Fase</span>
-                        </label>
-                        <div class="pl-6 pt-1 text-[11px] text-slate-400 leading-snug">
-                            Invierte la fase 180°, aplica ganancia de -0.02 dB y añade 5 muestras de silencio al final para forzar un hash binario PCM nuevo.
+                        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                                <span class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px]">8</span> Sanitización & Inversión de Fase
+                            </h3>
+                            <p class="text-slate-400">Modifica la huella y forma de onda del archivo para prevenir coincidencias automáticas en sistemas de escaneo de copyright. Invierte la fase 180°, aplica una variación imperceptible de ganancia (-0.02 dB) e inserta 5 muestras de silencio final.</p>
                         </div>
                     </div>
 
                 </div>
-            </div>
+            </details>
         </section>
 
-        <!-- Zona de Archivos y Vista Previa (7 columnas) -->
-        <section class="lg:col-span-7 flex flex-col gap-4">
-            
-            <!-- Drag & Drop Zone -->
-            <div id="dropzone" class="border-2 border-dashed border-slate-800 hover:border-indigo-500/80 bg-slate-900/50 hover:bg-slate-900 rounded-2xl p-8 text-center transition cursor-pointer flex flex-col items-center justify-center gap-3 group">
-                <input type="file" id="fileInput" multiple accept=".wav,audio/*" class="hidden">
-                <div class="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl border border-indigo-500/20 group-hover:scale-110 transition">
-                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+        <!-- Panel Interactivo Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Panel de Configuración (5 columnas) -->
+            <section class="lg:col-span-5 flex flex-col gap-4">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-4">
+                    
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i> Cadena de Proceso
+                        </h2>
+                        <span class="text-[10px] text-slate-500">Selecciona las etapas</span>
+                    </div>
+
+                    <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1 custom-scrollbar">
+
+                        <!-- 1. Formato de Audio -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-1" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>1. Formato & Resample</span>
+                            </label>
+                            <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Bits</span>
+                                    <select id="p1-bits" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                        <option value="16" selected>16-bit PCM</option>
+                                        <option value="24">24-bit PCM</option>
+                                        <option value="8">8-bit PCM</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Sample Rate</span>
+                                    <select id="p1-rate" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                        <option value="44100" selected>44.1 kHz</option>
+                                        <option value="48000">48.0 kHz</option>
+                                        <option value="22050">22.05 kHz</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Convertidor a Mono -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-2" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>2. Convertidor a Mono</span>
+                            </label>
+                            <div class="pl-6 pt-2 text-xs">
+                                <select id="p2-mode" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    <option value="mix" selected>Promediar canales (L+R / 2)</option>
+                                    <option value="left">Solo canal izquierdo (L)</option>
+                                    <option value="right">Solo canal derecho (R)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 3. Normalizar Volumen -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-3" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>3. Normalizar Volumen</span>
+                            </label>
+                            <div class="pl-6 pt-2 flex items-center gap-2 text-xs">
+                                <span class="text-slate-400">Pico máximo:</span>
+                                <input type="number" id="p3-target" step="0.1" value="-0.1" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <span class="text-slate-400">dBFS</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Recorte & Fade Out -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-4" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>4. Recortar Loop & Fade Out</span>
+                            </label>
+                            <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Duración (seg)</span>
+                                    <input type="number" id="p4-duration" step="0.01" value="1.65" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Fade Out (ms)</span>
+                                    <input type="number" id="p4-fade" value="15" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Ajustar BPM -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-5" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>5. Ajustar Loop a BPM</span>
+                            </label>
+                            <div class="pl-6 pt-2 space-y-2 text-xs">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block mb-1">BPM Original</span>
+                                        <input type="number" id="p5-bpmOrig" value="150" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block mb-1">BPM Objetivo</span>
+                                        <input type="number" id="p5-bpmTarget" value="120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500">Reescala la velocidad de reproducción del audio desde el tempo de origen al objetivo.</p>
+                            </div>
+                        </div>
+
+                        <!-- 6. Renombrado Masivo -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-6" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>6. Renombrar Lote de Archivos</span>
+                            </label>
+                            <div class="pl-6 pt-2 text-xs">
+                                <span class="text-[10px] text-slate-400 block mb-1">Prefijo de nombre</span>
+                                <input type="text" id="p6-prefix" placeholder="ej. PERC_" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <span class="text-[10px] text-slate-500 mt-1 block">Generará: PERC_01.wav, PERC_02.wav...</span>
+                            </div>
+                        </div>
+
+                        <!-- 7. Metadatos -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-7" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>7. Limpieza & Edición de Metadatos</span>
+                            </label>
+                            <div class="pl-6 pt-2 grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Artista/Autor</span>
+                                    <input type="text" id="p7-artist" placeholder="Mi Nombre" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block mb-1">Álbum/Pack</span>
+                                    <input type="text" id="p7-album" placeholder="SamplePack 2026" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. Sanitización Anti-Algoritmo -->
+                        <div class="bg-slate-800/40 border border-slate-800 rounded-xl p-3">
+                            <label class="flex items-center gap-2.5 cursor-pointer font-medium text-xs text-slate-200">
+                                <input type="checkbox" id="proc-8" class="proc-step w-4 h-4 accent-indigo-500 rounded">
+                                <span>8. Sanitización & Inversión de Fase</span>
+                            </label>
+                            <div class="pl-6 pt-1 text-[11px] text-slate-400 leading-snug">
+                                Invierte la fase 180°, aplica ganancia de -0.02 dB y añade 5 muestras de silencio al final para forzar un hash binario PCM nuevo.
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold text-sm text-slate-200">Arrastra aquí tus archivos WAV o haz clic</p>
-                    <p class="text-xs text-slate-500 mt-1">Soporta múltiples archivos a la vez. Procesamiento 100% privado en navegador.</p>
+            </section>
+
+            <!-- Zona de Archivos y Vista Previa (7 columnas) -->
+            <section class="lg:col-span-7 flex flex-col gap-4">
+                
+                <!-- Drag & Drop Zone -->
+                <div id="dropzone" class="border-2 border-dashed border-slate-800 hover:border-indigo-500/80 bg-slate-900/50 hover:bg-slate-900 rounded-2xl p-8 text-center transition cursor-pointer flex flex-col items-center justify-center gap-3 group">
+                    <input type="file" id="fileInput" multiple accept=".wav,audio/*" class="hidden">
+                    <div class="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl border border-indigo-500/20 group-hover:scale-110 transition">
+                        <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-slate-200">Arrastra aquí tus archivos WAV o haz clic</p>
+                        <p class="text-xs text-slate-500 mt-1">Soporta múltiples archivos a la vez. Procesamiento 100% privado en navegador.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Barra de estado y Acciones -->
-            <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-3 rounded-2xl gap-2 flex-wrap sm:flex-nowrap">
-                <span class="text-xs text-slate-400 pl-2">
-                    En cola: <b id="file-count" class="text-slate-200">0</b> archivos
-                </span>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearFiles()" class="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition">
-                        Limpiar todo
-                    </button>
+                <!-- Barra de estado y Acciones -->
+                <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-3 rounded-2xl gap-2 flex-wrap sm:flex-nowrap">
+                    <span class="text-xs text-slate-400 pl-2">
+                        En cola: <b id="file-count" class="text-slate-200">0</b> archivos
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="clearFiles()" class="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition">
+                            Limpiar todo
+                        </button>
 
-                    <!-- Botón 1: Procesar -->
-                    <button id="btn-process" onclick="processAllFiles()" disabled class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-indigo-600/25 flex items-center gap-1.5">
-                        <i data-lucide="cpu" class="w-4 h-4"></i>
-                        Procesar
-                    </button>
+                        <!-- Botón 1: Procesar -->
+                        <button id="btn-process" onclick="processAllFiles()" disabled class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-indigo-600/25 flex items-center gap-1.5">
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                            Procesar
+                        </button>
 
-                    <!-- Botón 2: Descargar ZIP -->
-                    <button id="btn-download" onclick="downloadZip()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
-                        <i data-lucide="download" class="w-4 h-4"></i>
-                        Descargar ZIP
-                    </button>
+                        <!-- Botón 2: Descargar ZIP -->
+                        <button id="btn-download" onclick="downloadZip()" disabled class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Descargar ZIP
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Lista de Archivos Cargados -->
-            <div id="file-list" class="flex-1 space-y-3 overflow-y-auto max-h-[500px] pr-1 custom-scrollbar">
-                <div id="empty-state" class="text-center py-16 border border-slate-900 rounded-2xl bg-slate-900/20">
-                    <i data-lucide="disc" class="w-12 h-12 text-slate-800 mx-auto mb-2 animate-spin-slow"></i>
-                    <p class="text-xs text-slate-600">Sube archivos WAV para comenzar</p>
+                <!-- Lista de Archivos Cargados -->
+                <div id="file-list" class="flex-1 space-y-3 overflow-y-auto max-h-[500px] pr-1 custom-scrollbar">
+                    <div id="empty-state" class="text-center py-16 border border-slate-900 rounded-2xl bg-slate-900/20">
+                        <i data-lucide="disc" class="w-12 h-12 text-slate-800 mx-auto mb-2 animate-spin-slow"></i>
+                        <p class="text-xs text-slate-600">Sube archivos WAV para comenzar</p>
+                    </div>
                 </div>
-            </div>
 
-        </section>
+            </section>
+
+        </div>
 
     </main>
 
